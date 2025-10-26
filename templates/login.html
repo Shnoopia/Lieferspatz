@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <style>
+        /* Body styling for a clean look */
+        body {
+            background-color: #f4f4f4; /* Light grey background */
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Centered container for the login form */
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto; /* Center form with more top spacing */
+            padding: 30px;
+            background: #ffffff; /* Clean white background for the form */
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Soft shadow for a subtle floating effect */
+            text-align: center;
+        }
+
+        /* Header styling */
+        .login-container h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .login-container p {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        /* Form label styling */
+        .form-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #555;
+            text-align: left;
+            display: block; /* Ensure labels are above fields */
+            margin-bottom: 8px;
+        }
+
+        /* Input and dropdown styling */
+        input, select {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background: #f9f9f9; /* Light background for input fields */
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: #007bff; /* Blue accent color for focus */
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+            outline: none;
+        }
+
+        /* Submit button styling */
+        button[type="submit"] {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+            background-color: #007bff; /* Solid blue button */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-3px); /* Slight lift on hover */
+            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
+        }
+
+        /* Add subtle animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-container {
+            animation: fadeIn 1s ease-out;
+        }
+
+        /* Responsive design for smaller screens */
+        @media (max-width: 576px) {
+            .login-container {
+                margin: 60px auto;
+                padding: 20px;
+            }
+
+            .login-container h1 {
+                font-size: 2rem;
+            }
+
+            input, select {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+
+            button[type="submit"] {
+                font-size: 1rem;
+                padding: 12px;
+            } 
+        }
+    </style>
+
+    <div class="login-container">
+        <h1>Welcome Back</h1>
+        <p>Please log in to continue to your account</p>
+    
+        <!-- Login Form -->
+        <form method="POST">
+            <!-- Username Field -->
+            <div class="mb-3">
+                <label for="username" class="form-label">Username (Phone/Email)</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username" required>
+            </div>
+    
+            <!-- Password Field -->
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
+            </div>
+    
+            <!-- Role Dropdown -->
+            <div class="mb-4">
+                <label for="role" class="form-label">Role</label>
+                <select name="role" id="role" class="form-select">
+                    <option value="customer">Customer</option>
+                    <option value="restaurant">Restaurant</option>
+                </select>
+            </div>
+    
+            <!-- Submit Button -->
+            <button type="submit">Login</button>
+        </form>
+    </div>
+{% endblock %}

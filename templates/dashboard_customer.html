@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block head%}
+  <title>Customer Dashboard</title>
+
+  <style>
+    /* Global Styling for Modern Look */
+    body {
+      font-family: 'Helvetica', sans-serif;
+      background-color: #f4f4f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Profile and Welcome Section Combined */
+    .profile-welcome-section {
+        background-color: #ffffff;
+        padding: 40px;
+        border-radius: 12px;
+        margin: 20px auto;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        max-width: 750px;
+        text-align: center;
+    }
+
+    /* Title for Profile and Welcome Section */
+    .profile-welcome-section h2 {
+        font-size: 30px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    /* Greeting Text */
+    .greeting-text {
+        font-size: 20px;
+        color: #555;
+        margin-bottom: 30px;
+        font-weight: 300;
+    }
+
+    /* Profile Details Section */
+    .profile-details {
+        text-align: left;
+        margin-top: 20px;
+    }
+
+    .profile-details ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .profile-details li {
+        font-size: 16px;
+        margin: 10px 0;
+        padding: 12px;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.3s ease;
+    }
+
+    .profile-details li:hover {
+        background-color: #f0f0f0;
+    }
+
+    .profile-details li span {
+        font-weight: 600;
+        color: #4CAF50;
+    }
+
+  </style>
+
+{%endblock%}
+
+{% block content %}
+<div class="container animate__animated animate__fadeInUp">
+
+  <!-- Combined Profile and Welcome Section -->
+  <div class="profile-welcome-section">
+
+      <!-- Welcome Text -->
+      <h2>Welcome, {{ user['FirstName'] }} {{ user['LastName'] }}!</h2>
+      <p class="greeting-text">We're happy to have you here. Below are your profile details:</p>
+
+      <!-- Profile Details List -->
+      <div class="profile-details">
+        <ul>
+            <li><span>Phone Number:</span> {{ user['PhoneNumber'] }}</li>
+            <li><span>Balance:</span> € {{ user['Balance'] | round(2) }}</li>
+            <li><span>Zip Code:</span> {{ user['ZipCode'] }}</li>
+            <li><span>Role:</span> {{ user['Role'] }}</li>
+        </ul>
+      </div>
+      
+  </div>
+
+  <!-- Restaurant List (unchanged) -->
+  <p align="center" style="font-size: 24px; font-weight: 600; margin-bottom: 30px;">Restaurants Near Me</p>
+  <div class="restaurantlist">
+    {% for restaurant in restaurantsclose %}
+    <div class="restaurant" data-open-time="{{ restaurant['OpenTime'] }}" data-close-time="{{ restaurant['CloseTime'] }}">
+      <form method="POST" action="{{ url_for('customer.itemorder') }}"> 
+        <input type="image" src="{{ url_for('static', filename=restaurant['ImageURL'].split('static/')[1]) }}" alt="{{restaurant['Name']}}" style="width:200px;height:120px;" />
+        <input type="hidden" name="selectedID" value="{{ restaurant['RestaurantID'] }}">
+      </form>
+      <p align="left"><b>{{ restaurant['Name'] }}</b></p>
+      <p align="left">{{ restaurant['OpenTime'] }} - {{ restaurant['CloseTime'] }}</p>
+      <p class="closed-text" style="display: none;">CLOSED</p>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+<!-- To Show the Restaurant Listing -->
+<style>
+  .restaurantlist {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  .restaurantlist > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px;
+    position: relative;
+    border-radius: 15px; /* Add curved borders */
+    overflow: hidden; /* Ensure content stays within the rounded corners */
+    border: 1px solid #ddd; /* Add a grey border */
+  }
+  .closed-restaurant {
+    border: 2px solid red;
+    opacity: 0.5;
+    pointer-events: none;
+    position: relative;
+    border-radius: 15px;
+  }
+  .closed-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: red;
+    color: white;
+    padding: 5px;
+    font-weight: bold;
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+</style>
+
+
+</br>
+<!-- End of New Part By Omar To Send to itemorder.html! -->
+{% endblock %}

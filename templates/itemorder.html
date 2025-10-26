@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<style>
+    body {
+        background-color: #f9f9f9;
+    }
+
+    h2, h3, h4 {
+        color: #333;
+    }
+
+    h2 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+
+    p {
+        line-height: 1.6;
+        color: #555;
+    }
+
+    .menu-section {
+        width: 62%;
+        float: left;
+        padding-right: 2%;
+    }
+
+    .cart-section {
+        width: 36%;
+        float: right;
+        padding-left: 2%;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+    }
+
+    .menu-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 10px;
+    }
+
+    .menu-table tr {
+        background-color: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .menu-table td {
+        padding: 15px;
+        vertical-align: top;
+    }
+
+    .menu-table img {
+        width: 200px;
+        height: 120px;
+        border-radius: 8px;
+    }
+
+    .add-to-cart {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .default-btn {
+        background-color: #28a745;
+        color: #fff;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .default-btn:hover {
+        background-color: #218838;
+    }
+
+    .cart-title {
+        text-align: center;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .cart-item {
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+    }
+
+    .cart-item p {
+        margin: 5px 0;
+    }
+
+    .btn {
+        margin-top: 10px;
+    }
+
+    .btn-success {
+        background-color: #007bff;
+        border: none;
+    }
+
+    .btn-success:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        border: none;
+    }
+
+    .btn-warning:hover {
+        background-color: #e0a800;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border: none;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+
+    .footer {
+        text-align: center;
+        padding: 20px;
+        margin-top: 40px;
+        position: relative;
+        clear: both;
+    }
+
+    .footer p {
+        margin: 0;
+        font-size: 14px;
+        color: #ddd;
+    }
+</style>
+
+<div>
+    <h2><b>{{ restaurantchosen['Name'] }}</b></h2>
+    <p>{{ restaurantchosen['Description'] }}</p>
+    <div class="menu-section">
+        <h3>Food</h3>
+        <table class="menu-table">
+            {% for itemlisting in itemschosen %}
+            {% if itemlisting['Category'] == 'Food' %}
+            <tr class="FoodNum {{ itemlisting['ItemID'] }}">
+                <td>
+                    <img src="{{ url_for('static', filename=itemlisting['ImageURL'].split('static/')[1]) }}" alt="Food Item: {{ itemlisting['Name'] }}">
+                </td>
+                <td>
+                    <p><strong>{{ itemlisting['Name'] }}</strong></p>
+                    <p>{{ itemlisting['Description'] }}</p>
+                    <div class="add-to-cart">
+                        <form method="POST" action="{{ url_for('customer.addtocart') }}">
+                            <input type="number" name="productquantity" value="1" size="2" min="1" max="99" style="width: 50px; text-align: center;">
+                            <input type="hidden" id="chosenItemID" name="chosenItemID" value="{{ itemlisting['ItemID'] }}">
+                            <input type="submit" value="Add To Cart" class="default-btn">
+                        </form>
+                        <p>€ {{ itemlisting['Price'] }}</p>
+                    </div>
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+        <h3>Drink</h3>
+        <table class="menu-table">
+            {% for itemlisting in itemschosen %}
+            {% if itemlisting['Category'] == 'Drink' %}
+            <tr class="DrinkNum {{ itemlisting['ItemID'] }}">
+                <td>
+                    <img src="{{ url_for('static', filename=itemlisting['ImageURL'].split('static/')[1]) }}" alt="Drink Item: {{ itemlisting['Name'] }}">
+                </td>
+                <td>
+                    <p><strong>{{ itemlisting['Name'] }}</strong></p>
+                    <p>{{ itemlisting['Description'] }}</p>
+                    <div class="add-to-cart">
+                        <form method="POST" action="{{ url_for('customer.addtocart') }}">
+                            <input type="number" name="productquantity" value="1" size="2" min="1" max="99" style="width: 50px; text-align: center;">
+                            <input type="hidden" id="chosenItemID" name="chosenItemID" value="{{ itemlisting['ItemID'] }}">
+                            <input type="submit" value="Add To Cart" class="default-btn">
+                        </form>
+                        <p>€ {{ itemlisting['Price'] }}</p>
+                    </div>
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+    <div class="cart-section animate__animated animate__pulse">
+        <h4 class="cart-title">Cart</h4>
+        <div>
+            {% if 'shoppingcart' in session and session['shoppingcart'] %}
+                {% for key, val in session['shoppingcart'].items() %}
+                    {% set Quantity = val['Quantity'] %}
+                    {% set Name = val['Name'] %}
+                    {% set Price = val['Price'] %}
+                    <div class="cart-item">
+                        <p><strong>{{ Name }}</strong></p>
+                        <p>{{ Quantity }} x € {{ Price }}</p>
+                        <form method="POST" action="{{ url_for('customer.deleteproduct') }}">
+                            <input type="hidden" id="deleteItemID" name="deleteItemID" value="{{ val['ItemToAdd'] }}">
+                            <input type="submit" value="Remove Item" class="btn btn-warning">
+                        </form>
+                    </div>
+                {% endfor %}
+                <div class="cart-buttons" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                    <a id="btnEmpty" href="{{ url_for('customer.empty_cart') }}" class="btn btn-danger">Empty Cart</a>
+                    <a href="{{ url_for('customer.paymentconfirm') }}" class="btn btn-success">Proceed To Payment</a>
+                </div>
+            {% else %}
+                <p>Your cart is empty.</p>
+            {% endif %}
+        </div>
+    </div> 
+</div>
+
+<div class="footer">
+</div>
+{% endblock %}

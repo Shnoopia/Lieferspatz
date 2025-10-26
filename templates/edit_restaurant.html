@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <title>Edit Restaurant Details</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        /* Styles for the form container */
+        .form-container {
+            max-width: 800px;
+            margin: 2rem auto; /* Adds margin to the form container */
+            padding: 2rem;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Title of the form */
+        .form-title {
+            font-size: 1.5rem;
+            color: #343a40;
+            text-align: center;
+            margin-bottom: 2rem; /* Increased margin for more gap */
+        }
+    
+        /* Styling for the restaurant image */
+        .restaurant-image {
+            max-width: 200px;
+            max-height: 200px;
+            margin-top: 0.5rem;
+            border-radius: 8px;
+        }
+    
+        /* Styles for the ZIP code field */
+        .zip-code-field {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+    
+        .zip-code-field input {
+            flex: 1;
+            border-radius: 4px;
+        }
+    
+        .zip-code-field button {
+            margin-left: 0.5rem;
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+        }
+    
+        .zip-code-field button i {
+            font-size: 1.2em;
+        }
+    
+        /* Custom styles for primary and secondary buttons */
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+        }
+    
+        .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+        }
+    
+        /* Styling for form labels */
+        label {
+            font-weight: bold;
+            color: #495057;
+        }
+    </style>
+{% endblock%}
+
+{% block content %}
+<div class="form-container animate__animated animate__fadeInUp">
+    <h1 class="form-title">Edit Restaurant Details</h1>
+
+    <!-- Form for editing restaurant details -->
+    <form method="POST" enctype="multipart/form-data" onsubmit="return validateZipCodes()">
+        <!-- Input for restaurant name -->
+        <div class="form-group">
+            <label for="name">Restaurant Name:</label>
+            <input type="text" class="form-control" name="name" value="{{ restaurant['Name'] }}" required>
+        </div>
+
+        <!-- Input for restaurant address -->
+        <div class="form-group">
+            <label for="address">Address:</label>
+            <input type="text" class="form-control" name="address" value="{{ restaurant['Address'] }}" required>
+        </div>
+
+        <!-- Input for zip code -->
+        <div class="form-group">
+            <label for="zip_code">Zip Code:</label>
+            <input type="text" class="form-control" name="zip_code" value="{{ restaurant['ZipCode'] }}" required>
+        </div>
+
+        <!-- Textarea for description -->
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <textarea class="form-control" name="description" rows="3" required>{{ restaurant['Description'] }}</textarea>
+        </div>
+
+        <!-- Input for image file -->
+        <div class="form-group">
+            <label for="image_url">Image:</label>
+            <input type="file" class="form-control-file" name="image_url" accept="image/*">
+            {% if restaurant['ImageURL'] %}
+            <div>
+                <!-- Display current image -->
+                <img src="{{ url_for('static', filename=restaurant['ImageURL'].split('static/')[1]) }}" alt="Restaurant Image" class="restaurant-image">
+                <p><strong>Current Image:</strong> {{ restaurant['ImageURL'].split('/')[-1] }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Input for open time -->
+        <div class="form-group">
+            <label for="open_time">Open Time:</label>
+            <input type="time" class="form-control" name="open_time" value="{{ restaurant['OpenTime'] }}" required>
+        </div>
+
+        <!-- Input for close time -->
+        <div class="form-group">
+            <label for="close_time">Close Time:</label>
+            <input type="time" class="form-control" name="close_time" value="{{ restaurant['CloseTime'] }}" required>
+        </div>
+
+        <!-- Delivery ZIP code fields -->
+        <div class="form-group">
+            <label for="delivery_zip_codes">Delivery ZIP Codes:</label>
+            <div id="zipCodeContainer">
+                {% for zip_code in delivery_zip_codes %}
+                <div class="zip-code-field">
+                    <!-- Input for individual ZIP codes -->
+                    <input type="text" class="form-control" name="delivery_zip_codes" value="{{ zip_code }}" placeholder="Enter delivery zip code">
+                    <button type="button" onclick="removeZipCode(this)"><i class="fas fa-trash-alt"></i></button>
+                </div>
+                {% endfor %}
+            </div>
+            <button type="button" class="btn btn-link" onclick="addZipCode()">+ Add Another ZIP Code</button>
+        </div>
+
+        <!-- Buttons for saving or canceling changes -->
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="{{ url_for('restaurant.restaurant_dashboard') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<!-- Include JavaScript for dynamically managing ZIP code fields -->
+<script src="{{ url_for('static', filename='js/addZipCodeField.js') }}"></script>
+
+<!-- Add validation for ZIP code fields -->
+<script>
+    function validateZipCodes() {
+        const zipCodeFields = document.querySelectorAll('input[name="delivery_zip_codes"]');
+        for (const field of zipCodeFields) {
+            if (field.value.trim() === '') {
+                alert('All delivery ZIP codes must be filled out.');
+                return false;
+            }
+        }
+        return true;
+    }
+</script>
+
+ <!-- Modal for payment confirmation -->
+ <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentModalLabel">Payment Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="paymentMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="declineButton">Decline</button>
+                <button type="button" class="btn btn-primary" id="acceptButton">Accept</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add WebSocket handling for payment notifications -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+<script>
+    const socket = io();
+
+    // Join restaurant-specific room
+    socket.emit('join_room', { room: 'restaurant_{{ user["RestaurantID"] }}' });
+
+    // Handle incoming payment notifications
+    socket.on('payment_received', function (data) {
+        const customerId = data.customer_id;
+        const customerName = data.customer_name;
+        const message = data.message;
+        document.getElementById('paymentMessage').innerText = `Payment received from ${customerName}: ${message}.`;
+
+        // Show the modal
+        $('#paymentModal').modal('show');
+
+        // Handle accept button click
+        document.getElementById('acceptButton').onclick = function () {
+            socket.emit('restaurant_reply', { customer_id: customerId, message: 'Payment accepted' });
+            $('#paymentModal').modal('hide');
+        };
+
+        // Handle decline button click
+        document.getElementById('declineButton').onclick = function () {
+            socket.emit('restaurant_reply', { customer_id: customerId, message: 'Payment declined' });
+            $('#paymentModal').modal('hide');
+        };
+    });
+</script>
+{% endblock %}

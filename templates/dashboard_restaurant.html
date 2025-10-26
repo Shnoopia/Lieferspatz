@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <title>Restaurant Dashboard</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: 500;
+            color: #34495e;
+        }
+
+        td {
+            color: #7f8c8d;
+        }
+
+        td img {
+            max-width: 80px;
+            border-radius: 8px;
+        }
+
+        .btn {
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 5px;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .modal-header {
+            background-color: #3498db;
+            color: white;
+            border-bottom: none;
+        }
+
+        .modal-footer .btn-secondary {
+            background-color: #7f8c8d;
+            border: none;
+        }
+
+        .modal-footer .btn-secondary:hover {
+            background-color: #636e72;
+        }
+
+        .modal-footer .btn-primary {
+            background-color: #2ecc71;
+            border: none;
+        }
+
+        .modal-footer .btn-primary:hover {
+            background-color: #27ae60;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul li {
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+    </style>
+{% endblock%}
+
+{% block content %}
+    <div class="container">
+        <h1 class="animate__animated animate__fadeIn">Welcome, {{ user['Name'] }}!</h1>
+        <div class="row">
+            <div class="col-md-6 animate__animated animate__fadeIn">
+                <p><strong>Status:</strong> <span class="{% if status == 'OPEN' %}text-success{% else %}text-danger{% endif %}"><strong> {{ status }}</strong> </span></p>
+                <p><strong>Email:</strong> {{ user['Email'] }}</p>
+                <p><strong>Address:</strong> {{ user['Address'] }}</p>
+                <p><strong>Description:</strong> {{ user['Description'] }}</p>
+                <p><strong>Balance:</strong> € {{ user['Balance'] | float | round(2) }}</p>
+                <p><strong>Open Time:</strong> {{ user['OpenTime'] }}</p>
+                <p><strong>Close Time:</strong> {{ user['CloseTime'] }}</p>
+                <p><strong>Delivery ZIP Codes:</strong></p>
+                <ul>
+                    {% for zip_code in delivery_zip_codes %}
+                        <li>{{ zip_code }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-md-6 text-center animate__animated animate__fadeInRight">
+                {% if user.ImageURL %}
+                    <img src="{{ url_for('static', filename=user.ImageURL.split('static/')[1]) }}" alt="Restaurant Image" class="img-fluid" style="max-width: 100%; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="table-responsive mt-4 animate__animated animate__fadeIn">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Created At</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>
+                            {% if item[5] == None %}
+                                <img src="{{ url_for('static', filename='images/foodlogo.png') }}" alt="Item Image">
+                            {% else %}
+                                <img src="{{ url_for('static', filename=item[5].split('static/')[1]) }}" alt="Item Image">
+                            {% endif %}
+                        </td>
+                        <td>{{ item[1] }}</td>
+                        <td>€ {{ item[2] }}</td>
+                        <td>{{ item[3] }}</td>
+                        <td>{{ item[6] }}</td>
+                        <td>{{ item[4].strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            <form action="/restaurant/edit_item_screen" method="POST">
+                                <button type="submit" name="ItemID" value="{{ item[0] }}" class="btn btn-primary">Edit</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form action="/restaurant/delete_item" method="POST" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                                <button type="submit" name="ItemID" value="{{ item[0] }}" class="btn btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal for payment confirmation -->
+    <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="paymentModalLabel">Payment Confirmation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="paymentMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="declineButton">Decline</button>
+                    <button type="button" class="btn btn-primary" id="acceptButton">Accept</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add WebSocket handling for payment notifications -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+
+        // Join restaurant-specific room
+        socket.emit('join_room', { room: 'restaurant_{{ user["RestaurantID"] }}' });
+
+        // Handle incoming payment notifications
+        socket.on('payment_received', function (data) {
+            const customerId = data.customer_id;
+            const customerName = data.customer_name;
+            const message = data.message;
+            document.getElementById('paymentMessage').innerText = `Payment received from ${customerName}: ${message}.`;
+
+            // Show the modal
+            $('#paymentModal').modal('show');
+
+            // Handle accept button click
+            document.getElementById('acceptButton').onclick = function () {
+                socket.emit('restaurant_reply', { customer_id: customerId, message: 'Payment accepted' });
+                $('#paymentModal').modal('hide');
+            };
+
+            // Handle decline button click
+            document.getElementById('declineButton').onclick = function () {
+                socket.emit('restaurant_reply', { customer_id: customerId, message: 'Payment declined' });
+                $('#paymentModal').modal('hide');
+            };
+        });
+    </script>
+    <!-- If one wants a seperate JS file uncomment line 98 to 102 and comment line 70 to 97-->
+    <!-- <script>
+        const restaurantID = "{{ user['RestaurantID'] }}";
+    </script>
+    <script src="{{ url_for('static', filename='js/dashboard_restaurant.js') }}"></script> -->
+{% endblock %}

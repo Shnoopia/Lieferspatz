@@ -1,0 +1,156 @@
+{% extends  'base.html' %}
+
+{% block head %}
+    <title> Add Item </title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-weight: 500;
+            margin-top: 10px;
+            color: #34495e;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        button {
+            font-size: 1rem;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-secondary {
+            background-color: #7f8c8d;
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: #636e72;
+        }
+    </style>
+{% endblock%}
+
+
+{% block content %}
+    <div class="container py-5 animate__animated animate__headShake">
+        <h1 class="text-center">Add Items Here</h1>
+    
+        <form method="POST" enctype="multipart/form-data">
+            <label for="Name">Name:</label>
+            <input type="text" name="Name" class="form-control" required>
+    
+            <label for="Price">Price:</label>
+            <input type="text" name="Price" class="form-control" required>
+    
+            <label for="Description">Description:</label>
+            <input type="text" name="Description" class="form-control" required>
+    
+            <label for="Category">Category:</label>
+            <select name="Category" class="form-control" required>
+                <option value="Food">Food</option>
+                <option value="Drink">Drink</option>
+            </select>
+    
+            <label for="image_url">Image:</label>
+            <input type="file" name="image_url" class="form-control-file" accept="image/*" required>
+    
+            <div class="mt-4 d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary">Add Item</button>
+                <a href="{{ url_for('restaurant.restaurant_dashboard') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Modal for payment confirmation -->
+    <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="paymentModalLabel">Payment Confirmation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="paymentMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="declineButton">Decline</button>
+                    <button type="button" class="btn btn-primary" id="acceptButton">Accept</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add WebSocket handling for payment notifications -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+
+        // Join restaurant-specific room
+        socket.emit('join_room', { room: 'restaurant_{{ user["RestaurantID"] }}' });
+
+        // Handle incoming payment notifications
+        socket.on('payment_received', function (data) {
+            const customerId = data.customer_id;
+            const customerName = data.customer_name;
+            const message = data.message;
+            document.getElementById('paymentMessage').innerText = `Payment received from ${customerName}: ${message}.`;
+
+            // Show the modal
+            $('#paymentModal').modal('show');
+
+            // Handle accept button click
+            document.getElementById('acceptButton').onclick = function () {
+                socket.emit('restaurant_reply', { customer_id: customerId, message: 'Payment accepted' });
+                $('#paymentModal').modal('hide');
+            };
+
+            // Handle decline button click
+            document.getElementById('declineButton').onclick = function () {
+                socket.emit('restaurant_reply', { customer_id: customerId, message: 'Payment declined' });
+                $('#paymentModal').modal('hide');
+            };
+        });
+    </script>
+{% endblock%}

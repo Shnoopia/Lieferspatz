@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <title>Received Orders</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .btn.active {
+            border: 2px solid red !important;
+            box-shadow: 0 0 10px red !important;
+            transform: scale(1.1);
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #155724;
+            margin-bottom: 20px;
+        }
+
+        .rejected-row {
+            background-color: #f0f0f0;
+            color: #a0a0a0;
+        }
+        .completed-row {
+            background-color: #d4edda; /* Green greyed-out background */
+            color: #155724;
+        }
+        .total-price {
+            color: green;
+            font-weight: bold;
+        }
+        .total-price-rejected {
+            color: #a0a0a0;
+            font-weight: normal;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-center">Received Orders</h1>
+    <table class="table table-bordered animate__animated animate__fadeIn">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer Name</th>
+                <th>Customer Address</th>
+                <th>Time of Order</th>
+                <th>Notes</th>
+                <th>Items</th>
+                <th>Total Price(85%)</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in currentorders %}
+            <tr class="{% if order['Status'] == 'Rejected' %}rejected-row{% endif %}">
+                <td>{{ order['OrderID'] }}</td>
+                <td>{{ order['CustomerName'] }}</td>
+                <td>{{ order['Address'] }}</td>
+                <td>{{ order['CreatedAt'].strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ order['Notes'] }}</td>
+                <td>
+                    <ul>
+                        {% for item in order['Items'] %}
+                        <li>{{ item['Name'] }} (x{{ item['Quantity'] }})</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td class="{% if order['Status'] == 'Rejected' %}total-price-rejected{% else %}total-price{% endif %}">
+                    {% if order['Status'] == 'Rejected' %}
+                        € {{ (0.85 * order['TotalPrice']) | round(2) }} (€{{ order['TotalPrice'] | round(2) }})
+                    {% else %}
+                        + € {{ (0.85 * order['TotalPrice']) | round(2) }} (€{{ order['TotalPrice'] | round(2) }})
+                    {% endif %}
+                </td>                
+                <td>{{ order['Status'] }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('restaurant.update_order_status', order_id=order['OrderID']) }}">
+                        <button type="submit" name="status" value="InProcess" class="btn btn-warning {% if order['Status'] == 'InProcess' %}active{% endif %}" {% if order['Status'] == 'Rejected' %}disabled{% endif %}>In Process</button>
+                        <button type="submit" name="status" value="InDelivery" class="btn btn-info {% if order['Status'] == 'InDelivery' %}active{% endif %}" {% if order['Status'] == 'Rejected' %}disabled{% endif %}>In Delivery</button>
+                        <button type="submit" name="status" value="Completed" class="btn btn-success {% if order['Status'] == 'Completed' %}active{% endif %}" {% if order['Status'] == 'Rejected' %}disabled{% endif %}>Completed</button>
+                        <button type="submit" name="status" value="Rejected" class="btn btn-danger {% if order['Status'] == 'Rejected' %}active{% endif %}" {% if order['Status'] == 'Rejected' %}disabled{% endif %}>Reject</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+            {% for order in completedorders %}
+            <tr class="{% if order['Status'] == 'Rejected' %}rejected-row{% elif order['Status'] == 'Completed' %}completed-row{% endif %}">
+                <td>{{ order['OrderID'] }}</td>
+                <td>{{ order['CustomerName'] }}</td>
+                <td>{{ order['Address'] }}</td>
+                <td>{{ order['CreatedAt'].strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ order['Notes'] }}</td>
+                <td>
+                    <ul>
+                        {% for item in order['Items'] %}
+                        <li>{{ item['Name'] }} (x{{ item['Quantity'] }})</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td class="{% if order['Status'] == 'Rejected' %}total-price-rejected{% else %}total-price{% endif %}">
+                    {% if order['Status'] == 'Rejected' %}
+                        € {{ (0.85 * order['TotalPrice']) | round(2) }} (€{{ order['TotalPrice'] | round(2) }})
+                    {% else %}
+                        + € {{ (0.85 * order['TotalPrice']) | round(2) }} (€{{ order['TotalPrice'] | round(2) }})
+                    {% endif %}
+                </td>                
+                <td>{{ order['Status'] }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('restaurant.update_order_status', order_id=order['OrderID']) }}">
+                        <button type="submit" name="status" value="InProcess" class="btn btn-warning {% if order['Status'] == 'InProcess' %}active{% endif %}" {% if order['Status'] == 'Rejected' %}disabled{% endif %}>In Process</button>
+                        <button type="submit" name="status" value="InDelivery" class="btn btn-info {% if order['Status'] == 'InDelivery' %}active{% endif %}" {% if order['Status'] == 'Rejected' %}disabled{% endif %}>In Delivery</button>
+                        <button type="submit" name="status" value="Completed" class="btn btn-success {% if order['Status'] == 'Completed' %}active{% endif %}" {% if order['Status'] == 'Rejected' %}disabled{% endif %}>Completed</button>
+                        <button type="submit" name="status" value="Rejected" class="btn btn-danger {% if order['Status'] == 'Rejected' %}active{% endif %}" {% if order['Status'] == 'Rejected' %}disabled{% endif %}>Reject</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+            {% for order in rejectedorders %}
+            <tr class="{% if order['Status'] == 'Rejected' %}rejected-row{% endif %}">
+                <td>{{ order['OrderID'] }}</td>
+                <td>{{ order['CustomerName'] }}</td>
+                <td>{{ order['Address'] }}</td>
+                <td>{{ order['CreatedAt'].strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ order['Notes'] }}</td>
+                <td>
+                    <ul>
+                        {% for item in order['Items'] %}
+                        <li>{{ item['Name'] }} (x{{ item['Quantity'] }})</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td class="{% if order['Status'] == 'Rejected' %}total-price-rejected{% else %}total-price{% endif %}">
+                    {% if order['Status'] == 'Rejected' %}
+                        € {{ (0.85 * order['TotalPrice']) | round(2) }} (€{{ order['TotalPrice'] | round(2) }})
+                    {% else %}
+                        + € {{ (0.85 * order['TotalPrice']) | round(2) }} (€{{ order['TotalPrice'] | round(2) }})
+                    {% endif %}
+                </td>                
+                <td>{{ order['Status'] }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('restaurant.update_order_status', order_id=order['OrderID']) }}">
+                        <button type="submit" name="status" value="InProcess" class="btn btn-warning {% if order['Status'] == 'InProcess' %}active{% endif %}" {% if order['Status'] == 'Rejected' %}disabled{% endif %}>In Process</button>
+                        <button type="submit" name="status" value="InDelivery" class="btn btn-info {% if order['Status'] == 'InDelivery' %}active{% endif %}" {% if order['Status'] == 'Rejected' %}disabled{% endif %}>In Delivery</button>
+                        <button type="submit" name="status" value="Completed" class="btn btn-success {% if order['Status'] == 'Completed' %}active{% endif %}" {% if order['Status'] == 'Rejected' %}disabled{% endif %}>Completed</button>
+                        <button type="submit" name="status" value="Rejected" class="btn btn-danger {% if order['Status'] == 'Rejected' %}active{% endif %}" {% if order['Status'] == 'Rejected' %}disabled{% endif %}>Reject</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+     <!-- Modal for payment confirmation -->
+     <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="paymentModalLabel">Payment Confirmation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="paymentMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="declineButton">Decline</button>
+                    <button type="button" class="btn btn-primary" id="acceptButton">Accept</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add WebSocket handling for payment notifications -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+
+        // Join restaurant-specific room
+        socket.emit('join_room', { room: 'restaurant_{{ user["RestaurantID"] }}' });
+
+        // Handle incoming payment notifications
+        socket.on('payment_received', function (data) {
+            const customerId = data.customer_id;
+            const customerName = data.customer_name;
+            const message = data.message;
+            document.getElementById('paymentMessage').innerText = `Payment received from ${customerName}: ${message}.`;
+
+            // Show the modal
+            $('#paymentModal').modal('show');
+
+            // Handle accept button click
+            document.getElementById('acceptButton').onclick = function () {
+                socket.emit('restaurant_reply', { customer_id: customerId, message: 'Payment accepted' });
+                $('#paymentModal').modal('hide');
+            };
+
+            // Handle decline button click
+            document.getElementById('declineButton').onclick = function () {
+                socket.emit('restaurant_reply', { customer_id: customerId, message: 'Payment declined' });
+                $('#paymentModal').modal('hide');
+            };
+        });
+    </script>
+{% endblock %}

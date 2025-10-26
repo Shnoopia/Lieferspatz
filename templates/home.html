@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <style>
+        /* Page background */
+        body {
+            background: #f7f7f7; /* Light background to make the buttons stand out */
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Heading styling */
+        h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        /* Row styling */
+        .row {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap; /* Allows the buttons to wrap on smaller screens */
+        }
+
+        .col-md-6 {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        /* Button styling */
+        .btn-lg {
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 15px 20px;
+            border-radius: 10px;
+            width: 100%;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        /* Customer button - Blue gradient */
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3); /* Blue gradient */
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0056b3, #004085);
+            transform: scale(1.05); /* Slight zoom effect */
+            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        /* Restaurant button - Grey gradient */
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #495057); /* Grey gradient */
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #495057, #343a40);
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .btn-lg {
+                font-size: 1.3rem;
+                padding: 12px 15px;
+            }
+        }
+    </style>
+
+    <div class="container">
+        <h1 class="text-center animate__animated animate__fadeInDown">Welcome to Lieferspatz</h1>
+        <div class="row">
+            <div class="col-md-6 animate__animated animate__fadeInLeft">
+                <a href="{{ url_for('customer.register_customer') }}" class="btn btn-primary btn-lg mb-3">Register as Customer</a>
+            </div>
+            <div class="col-md-6 animate__animated animate__fadeInRight">
+                <a href="{{ url_for('restaurant.register_restaurant') }}" class="btn btn-secondary btn-lg mb-3">Register as Restaurant</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

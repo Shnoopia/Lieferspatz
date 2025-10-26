@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <title>Past Orders</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Page Styling */
+        body {
+            background-color: #f9f9f9;
+        }
+
+        /* Header Styling */
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 2.5rem;
+            color: #333;
+        }
+
+        /* Table Styling */
+        .table {
+            margin: 20px auto;
+            max-width: 90%;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .table th {
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+        }
+
+        .table th, .table td {
+            vertical-align: middle !important;
+            padding: 15px;
+            font-size: 1rem;
+        }
+
+        .table td ul {
+            padding-left: 15px;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #f8f9fa;
+        }
+
+        /* Status Column Styling */
+        .status-badge {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-align: center;
+            
+        }
+
+        .status-badge.Rejected {
+            background-color: #dc3545;
+        }
+
+        .status-badge.Completed {
+            background-color: #28a745;
+        }
+
+        .status-badge.Pending {
+            background-color: #ffc107;
+            color: #333;
+        }
+
+        /* Rejected/Completed Row Styling */
+        .rejected-row {
+            opacity: 0.6;
+        }
+
+    </style>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{% endblock %}
+
+{% block content %}
+    <h1>Past Orders</h1>
+    <table class="table table-bordered table-striped animate__animated animate__fadeIn">
+        <thead>
+            <tr>
+                <th>Restaurant Name</th>
+                <th>Restaurant Address</th>
+                <th>Time of Order</th>
+                <th>Notes</th>
+                <th>Items</th>
+                <th>Total Price</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in currentorders %}
+            <tr class="{% if order['Status'] == 'Rejected' or order['Status'] == 'Completed' %}rejected-row{% endif %}">
+                <td>{{ order['Name'] }}</td>
+                <td>{{ order['Address'] }}</td>
+                <td>{{ order['CreatedAt'].strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ order['Notes'] }}</td>
+                <td>
+                    <ul>
+                        {% for item in order['Items'] %}
+                        <li>{{ item['Name'] }} (x{{ item['Quantity'] }})</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td>€ {{ order['TotalPrice'] }}</td>
+                <td><span class="status-badge {{ order['Status'] }}">{{ order['Status'] }}</span></td>
+            </tr>
+            {% endfor %}
+            {% for order in previousorders %}
+            <tr class="{% if order['Status'] == 'Rejected' or order['Status'] == 'Completed' %}rejected-row{% endif %}">
+                <td>{{ order['Name'] }}</td>
+                <td>{{ order['Address'] }}</td>
+                <td>{{ order['CreatedAt'].strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ order['Notes'] }}</td>
+                <td>
+                    <ul>
+                        {% for item in order['Items'] %}
+                        <li>{{ item['Name'] }} (x{{ item['Quantity'] }})</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td>€ {{ order['TotalPrice'] }}</td>
+                <td><span class="status-badge {{ order['Status'] }}">{{ order['Status'] }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

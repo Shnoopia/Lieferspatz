@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="profile-header">
+  <h2>Update Your Profile</h2>
+</div>
+
+<!-- Profile Section -->
+<div class = "flex-container animate__animated animate__fadeIn">
+    <div class="containerCustomerEdit">
+    <!-- Profile Edit Section -->
+    <div class="profile-edit-section">
+        <h4 class="current-details-heading">Your current profile details:</h4>
+
+        <!-- Display current profile details -->
+        <ul class="list-group">
+            <li class="list-group-item"><strong>First Name:</strong> {{ user['FirstName'] }}</li>
+            <li class="list-group-item"><strong>Last Name:</strong> {{ user['LastName'] }}</li>
+            <li class="list-group-item"><strong>Address:</strong> {{ user['Address'] }}</li>
+            <li class="list-group-item"><strong>ZipCode:</strong> {{ user['ZipCode'] }}</li>
+            <li class="list-group-item"><strong>Phone Number:</strong> {{ user['PhoneNumber'] }}</li>
+            <li class="list-group-item"><strong>Balance:</strong> € {{ user['Balance'] }}</li>
+            <li class="list-group-item"><strong>Role:</strong> {{ user['Role'] }}</li>
+        </ul>
+
+        <!-- Instructions for updating data -->
+        <p class="text-center mt-4">Please Choose Which Data To Edit And Type Its New Data (Unchanged Remains The Same.):</p>
+
+        <!-- Form to update the profile -->
+        <form method="POST" class="profile-edit-form">
+            <div class="form-group">
+                <input type="text" name="first_name" value="{{ user['FirstName'] }}" placeholder="First Name" class="form-control mb-3" required>
+            </div>
+            <div class="form-group">
+                <input type="text" name="last_name" value="{{ user['LastName'] }}" placeholder="Last Name" class="form-control mb-3" required>
+            </div>
+            <div class="form-group">
+                <input type="text" name="address" value="{{ user['Address'] }}" placeholder="Address" class="form-control mb-3" required>
+            </div>
+            <div class="form-group">
+                <input type="text" name="zip_code" value="{{ user['ZipCode'] }}" placeholder="Zip Code" class="form-control mb-3" required>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-success btn-lg">Save Changes</button>
+                <a href="{{ url_for('customer.customer_dashboard') }}" class="btn btn-danger btn-lg ml-3">Cancel</a>
+            </div>
+        </form>
+    </div>
+    </div>
+</div>
+
+<style>
+  /* Full-width Header Styling */
+
+  .flex-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .profile-header {
+    width: 100%;
+    text-align: center;
+    padding: 40px 0;
+  }
+
+  .profile-header h2 {
+    font-size: 36px;
+    font-weight: 700;
+    margin: 0;
+  }
+
+
+  /* Container and Centering */
+  .containerCustomerEdit {
+    max-width: 800px;
+    padding: 0 15px;
+  }
+
+  /* Profile Edit Section */
+  .profile-edit-section {
+      background-color: #fff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      margin-top: 20px;
+  }
+
+  /* Profile Details Heading */
+  .current-details-heading {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 20px;
+  }
+
+  .list-group-item {
+      font-size: 16px;
+      color: #555;
+      padding: 12px 20px;
+  }
+
+  /* Form Styling */
+  .profile-edit-form .form-group input {
+      font-size: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+  }
+
+  /* Button Styling */
+  .btn-lg {
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+  }
+
+  .btn-success {
+      background-color: #28a745;
+      border-color: #28a745;
+  }
+
+  .btn-danger {
+      background-color: #dc3545;
+      border-color: #dc3545;
+  }
+
+  .btn-success:hover {
+      background-color: #218838;
+      border-color: #1e7e34;
+  }
+
+  .btn-danger:hover {
+      background-color: #c82333;
+      border-color: #bd2130;
+  }
+
+  .text-center {
+      text-align: center;
+  }
+
+  .mt-4 {
+      margin-top: 20px;
+  }
+
+  .mb-3 {
+      margin-bottom: 15px;
+  }
+</style>
+
+{% endblock %}
